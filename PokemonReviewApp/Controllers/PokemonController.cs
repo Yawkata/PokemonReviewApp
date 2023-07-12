@@ -14,14 +14,17 @@ namespace PokemonReviewApp.Controllers
         private readonly IPokemonRepository pokemonRepository;
         private readonly IOwnerRepository ownerRepository;
         private readonly ICategoryRepository categoryRepository;
+        private readonly IReviewRepository reviewRepository;
         private readonly IMapper mapper;
 
         public PokemonController(IPokemonRepository pokemonRepository, 
-            IOwnerRepository ownerRepository, ICategoryRepository categoryRepository, IMapper mapper)
+            IOwnerRepository ownerRepository, ICategoryRepository categoryRepository, 
+            IReviewRepository reviewRepository, IMapper mapper)
         {
             this.pokemonRepository = pokemonRepository;
             this.ownerRepository = ownerRepository;
             this.categoryRepository = categoryRepository;
+            this.reviewRepository = reviewRepository;
             this.mapper = mapper;
         }
 
@@ -147,6 +150,39 @@ namespace PokemonReviewApp.Controllers
             }
 
             return Ok("Successfully updated pokemon!");
+        }
+
+        [HttpDelete("{pokeId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult DeletePokemon(int pokeId)
+        {
+            if (!pokemonRepository.PokemonExists(pokeId))
+            {
+                return NotFound();
+            }
+
+            var reviewsToDelete = reviewRepository.GetReviewsOfAPokemon(pokeId);
+            var pokemonToDelete = pokemonRepository.GetPokemon(pokeId);
+
+            if (!ModelState.IsValid)
+            { 
+                return BadRequest(ModelState); 
+            }
+
+            if (!reviewRepository.DeleteReviews(reviewsToDelete))
+            {
+                ModelState.AddModelError("", "Error while deleting reviews of pokemon!");
+                return StatusCode(500, ModelState);
+            }
+
+            if (!pokemonRepository.DeletePokemon(pokemonToDelete))
+            {
+                ModelState.AddModelError("", "Error while deleting pokemon!");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully deleted pokemon!");
         }
     }
 }

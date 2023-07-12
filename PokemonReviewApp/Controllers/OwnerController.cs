@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Resources;
 
 namespace PokemonReviewApp.Controllers
 {
@@ -166,6 +167,32 @@ namespace PokemonReviewApp.Controllers
             }
 
             return Ok("Successfully updated owner!");
+        }
+
+        [HttpDelete("{ownerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult DeleteOwner(int ownerId)
+        {
+            if (!ownerRepository.OwnerExists(ownerId))
+            {
+                return NotFound();
+            }
+
+            var ownerToDelete = ownerRepository.GetOwner(ownerId);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!ownerRepository.DeleteOwner(ownerToDelete))
+            {
+                ModelState.AddModelError("", "Error while deleting owner");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully deleted owner!");
         }
     }
 }

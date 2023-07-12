@@ -18,6 +18,8 @@ namespace PokemonReviewApp.Interfaces
 
         bool UpdatePokemon(Pokemon pokemon);
 
+        bool DeletePokemon(Pokemon pokemon);
+
         bool Save();
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using PokemonReviewApp.Repository;
 
 namespace PokemonReviewApp.Controllers
 {
@@ -144,6 +145,32 @@ namespace PokemonReviewApp.Controllers
             }
 
             return Ok("Successfully updated reviewer!");
+        }
+
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!reviewerRepository.ReviewerExists(reviewerId))
+            {
+                return NotFound();
+            }
+
+            var reviewerToDelete = reviewerRepository.GetReviewer(reviewerId);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!reviewerRepository.DeleteReviewer(reviewerToDelete))
+            {
+                ModelState.AddModelError("", "Error while deleting reviewer");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully deleted reviewer!");
         }
     }
 }
