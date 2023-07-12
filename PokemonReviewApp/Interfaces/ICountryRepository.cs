@@ -12,6 +12,10 @@ namespace PokemonReviewApp.Interfaces
         
         List<Owner> GetOwnersFromCountry(int id);
 
+        bool CreateCountry(Country country);
+
+        bool Save();
+
         bool CountryExists(int id);
 
     }

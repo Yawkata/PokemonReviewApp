@@ -10,6 +10,10 @@ namespace PokemonReviewApp.Interfaces
 
         List<Pokemon> GetPokemonByCategory(int id);
 
+        bool CreateCategory(Category category);
+
+        bool Save();
+
         bool CategoryExists(int id);
     }
 }

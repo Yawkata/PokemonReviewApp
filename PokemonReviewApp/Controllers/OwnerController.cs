@@ -11,11 +11,14 @@ namespace PokemonReviewApp.Controllers
     public class OwnerController : Controller
     {
         private readonly IOwnerRepository ownerRepository;
+        private readonly ICountryRepository countryRepository;
         private readonly IMapper mapper;
 
-        public OwnerController(IOwnerRepository ownerRepository, IMapper mapper)
+        public OwnerController(IOwnerRepository ownerRepository, 
+            ICountryRepository countryRepository, IMapper mapper)
         {
             this.ownerRepository = ownerRepository;
+            this.countryRepository = countryRepository;
             this.mapper = mapper;
         }
         
@@ -89,6 +92,44 @@ namespace PokemonReviewApp.Controllers
             }
 
             return Ok(owners);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto ownerCreate)
+        {
+            if (ownerCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var owner = ownerRepository.GetOwners()
+                .Where(o => o.FirstName.ToUpper() == ownerCreate.FirstName.ToUpper() &&
+                o.LastName.ToUpper() == ownerCreate.LastName.ToUpper())
+                .FirstOrDefault();
+
+            if (owner != null)
+            {
+                ModelState.AddModelError("", "Owner Already Exists!");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var ownerMap = mapper.Map<Owner>(ownerCreate);
+            ownerMap.Country = countryRepository.GetCountry(countryId);
+
+            if (!ownerRepository.CreateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Error while saving owner");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created new owner!");
         }
     }
 }

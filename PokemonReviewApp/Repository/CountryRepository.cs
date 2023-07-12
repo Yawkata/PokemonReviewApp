@@ -1,6 +1,8 @@
-﻿using PokemonReviewApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PokemonReviewApp.Repository
 {
@@ -18,6 +20,12 @@ namespace PokemonReviewApp.Repository
             return context.Countries.Any(c => c.Id == id);
         }
 
+        public bool CreateCountry(Country country)
+        {
+            context.Add(country);
+            return Save();
+        }
+
         public List<Country> GetCountries()
         {
             return context.Countries.OrderBy(c => c.Id).ToList();
@@ -30,14 +38,19 @@ namespace PokemonReviewApp.Repository
 
         public Country GetCountryByOwner(int ownerId)
         {
-            //return context.Owners.Where(o => o.Id == ownerId).FirstOrDefault().Country;
-            return context.Owners.Select(o => o.Country).FirstOrDefault();
+            //return context.Owners.Include(x => x.Country).Where(o => o.Id == ownerId).FirstOrDefault().Country;
+            return context.Owners.Where(o => o.Id == ownerId).Select(o => o.Country).FirstOrDefault();
         }
 
         public List<Owner> GetOwnersFromCountry(int countryId)
         {
             //return context.Countries.Where(c => c.Id == countryId).FirstOrDefault().Owners.ToList();
             return context.Owners.Where(o => o.Country.Id == countryId).ToList();
+        }
+
+        public bool Save()
+        {
+            return context.SaveChanges() > 0 ? true : false;
         }
     }
 }
