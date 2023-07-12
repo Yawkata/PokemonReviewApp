@@ -40,9 +40,16 @@ namespace PokemonReviewApp.Repository
             return pokemons;
         }
 
+        public bool UpdateCategory(Category category)
+        {
+            context.Update(category);
+            return Save();
+        }
+
         public bool Save()
         {
             return context.SaveChanges() > 0 ? true : false;
         }
+
     }
 }

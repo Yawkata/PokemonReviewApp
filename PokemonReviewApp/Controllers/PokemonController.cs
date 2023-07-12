@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Mvc; // model view controller
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -11,11 +12,16 @@ namespace PokemonReviewApp.Controllers
     public class PokemonController : Controller
     {
         private readonly IPokemonRepository pokemonRepository;
+        private readonly IOwnerRepository ownerRepository;
+        private readonly ICategoryRepository categoryRepository;
         private readonly IMapper mapper;
 
-        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper)
+        public PokemonController(IPokemonRepository pokemonRepository, 
+            IOwnerRepository ownerRepository, ICategoryRepository categoryRepository, IMapper mapper)
         {
             this.pokemonRepository = pokemonRepository;
+            this.ownerRepository = ownerRepository;
+            this.categoryRepository = categoryRepository;
             this.mapper = mapper;
         }
 
@@ -106,6 +112,41 @@ namespace PokemonReviewApp.Controllers
             }
 
             return Ok("Successfully created new pokemon!");
+        }
+
+        [HttpPut("{pokeId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult UpdatePokemon(int pokeId, [FromBody] PokemonDto pokemonUpdate)
+        {
+            if (pokemonUpdate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (pokeId != pokemonUpdate.Id)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!pokemonRepository.PokemonExists(pokeId)) 
+            { 
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var pokemonMap = mapper.Map<Pokemon>(pokemonUpdate);
+
+            if (!pokemonRepository.UpdatePokemon(pokemonMap))
+            {
+                ModelState.AddModelError("", "Error while updating pokemon");
+            }
+
+            return Ok("Successfully updated pokemon!");
         }
     }
 }

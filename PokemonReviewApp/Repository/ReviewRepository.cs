@@ -39,6 +39,12 @@ namespace PokemonReviewApp.Repository
             return context.Reviews.Any(r => r.Id == reviewId);
         }
 
+        public bool UpdateReview(Review review)
+        {
+            context.Update(review);
+            return Save();
+        }
+
         public bool Save()
         {
             return context.SaveChanges() > 0 ? true : false;

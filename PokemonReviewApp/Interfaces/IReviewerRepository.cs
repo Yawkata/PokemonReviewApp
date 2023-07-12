@@ -14,6 +14,8 @@ namespace PokemonReviewApp.Interfaces
 
         bool CreateReviewer(Reviewer reviewer);
 
+        bool UpdateReviewer(Reviewer reviewer);
+
         bool Save();
     }
 }

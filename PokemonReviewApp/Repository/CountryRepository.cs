@@ -48,6 +48,12 @@ namespace PokemonReviewApp.Repository
             return context.Owners.Where(o => o.Country.Id == countryId).ToList();
         }
 
+        public bool UpdateCountry(Country country)
+        {
+            context.Update(country);
+            return Save();
+        }
+
         public bool Save()
         {
             return context.SaveChanges() > 0 ? true : false;
