@@ -1,5 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
+using PokemonReviewApp.Dto.RequestDTOs;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,41 +12,43 @@ namespace PokemonReviewApp.Repository
 {
     public class JWTManagerRepository : IJWTManagerRepository
     {
-        Dictionary<string, string> UsersRecords = new Dictionary<string, string>
-        {
-            { "user1","password1"},
-            { "user2","password2"},
-            { "user3","password3"},
-        };
-
         private readonly IConfiguration iconfiguration;
-        public JWTManagerRepository(IConfiguration iconfiguration)
+        private readonly DataContext context;
+
+        public JWTManagerRepository(IConfiguration iconfiguration, DataContext context)
         {
             this.iconfiguration = iconfiguration;
+            this.context = context;
         }
-        public Tokens Authenticate(OwnerDto user)
+        public Tokens Authenticate(OwnerAuthenticationRequestDTO user)
         {
-            if (!UsersRecords.Any(x => x.Key == user.Nickname && x.Value == user.Password))
+            var users = context.Owners.ToList();
+            if (!users.Any(x => x.Nickname == user.Nickname && x.Password == user.Password))
             {
                 return null;
             }
 
-            // Else we generate JSON Web Token
-            var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.UTF8.GetBytes(iconfiguration["JWT:Key"]);
+            var securityKey = new SymmetricSecurityKey(tokenKey);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-              {
-                new Claim(ClaimTypes.Name, user.Nickname),
-                  // new Claim(ClaimTypes.Role, users.Role)}),
-              }),
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, user.Nickname),
+                    // new Claim(ClaimTypes.Role, users.Role)}),
+                }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = credentials
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new Tokens { Token = tokenHandler.WriteToken(token) };
 
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+            var jwtToken = jwtTokenHandler.WriteToken(token);
+
+            return new Tokens { Token = jwtToken };
         }
     }
 }

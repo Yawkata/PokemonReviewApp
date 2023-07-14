@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
-using System.Resources;
+using Microsoft.AspNetCore.Authorization;
+using PokemonReviewApp.Dto.RequestDTOs;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OwnerController : Controller
@@ -14,13 +16,15 @@ namespace PokemonReviewApp.Controllers
         private readonly IOwnerRepository ownerRepository;
         private readonly ICountryRepository countryRepository;
         private readonly IMapper mapper;
+        private readonly IJWTManagerRepository jWTManager;
 
         public OwnerController(IOwnerRepository ownerRepository, 
-            ICountryRepository countryRepository, IMapper mapper)
+            ICountryRepository countryRepository, IMapper mapper, IJWTManagerRepository jWTManager)
         {
             this.ownerRepository = ownerRepository;
             this.countryRepository = countryRepository;
             this.mapper = mapper;
+            this.jWTManager = jWTManager;
         }
         
 
@@ -115,6 +119,21 @@ namespace PokemonReviewApp.Controllers
             }
 
             return Ok("Successfully created new owner!");
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("login")]
+        public IActionResult Authenticate(OwnerAuthenticationRequestDTO userdata)
+        {
+            var token = jWTManager.Authenticate(userdata);
+
+            if (token == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(token);
         }
 
         [HttpPut("{ownerId}")]

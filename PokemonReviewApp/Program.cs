@@ -19,6 +19,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(o =>
 {
     var Key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
@@ -27,7 +28,7 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = false,
         ValidateAudience = false,
-        ValidateLifetime = true,
+        ValidateLifetime = false,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
@@ -35,7 +36,7 @@ builder.Services.AddAuthentication(options =>
     };
 }); 
 
-builder.Services.AddSingleton<IJWTManagerRepository, JWTManagerRepository>();
+builder.Services.AddScoped<IJWTManagerRepository, JWTManagerRepository>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -62,6 +63,7 @@ var securityRequirements = new OpenApiSecurityRequirement()
     {
         new OpenApiSecurityScheme
         {
+            In = ParameterLocation.Header,
             Reference = new OpenApiReference
             {
                 Type = ReferenceType.SecurityScheme,
