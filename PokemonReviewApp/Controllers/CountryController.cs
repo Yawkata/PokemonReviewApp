@@ -69,27 +69,6 @@ namespace PokemonReviewApp.Controllers
             return Ok(country);
         }
 
-        // Does Not Work !
-        [HttpGet("{countryId}/owners")]
-        [ProducesResponseType(200, Type = typeof(List<Owner>))]
-        [ProducesResponseType(400)]
-        public IActionResult GetOwnersFromCountry(int countryId)
-        {
-            if (countryRepository.CountryExists(countryId))
-            {
-                return NotFound();
-            }
-
-            var owners = mapper.Map<List<OwnerDto>>(countryRepository.GetOwnersFromCountry(countryId));
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(owners);
-        }
-
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

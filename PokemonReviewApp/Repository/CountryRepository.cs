@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Data;
+﻿using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
-using System.Reflection.Metadata.Ecma335;
 
 namespace PokemonReviewApp.Repository
 {
@@ -62,7 +60,7 @@ namespace PokemonReviewApp.Repository
 
         public bool Save()
         {
-            return context.SaveChanges() > 0 ? true : false;
+            return context.SaveChanges() != 0;
         }
     }
 }

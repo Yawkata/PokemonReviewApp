@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using PokemonReviewApp.Dto;
+using PokemonReviewApp.Dto.RequestDTOs;
+using PokemonReviewApp.Dto.ResponseDTOs;
 using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Helper
@@ -20,6 +22,10 @@ namespace PokemonReviewApp.Helper
             CreateMap<ReviewDto, Review>();
             CreateMap<Reviewer, ReviewerDto>();
             CreateMap<ReviewerDto, Reviewer>();
+            CreateMap<CategoryRequest, Category>();
+            CreateMap<Category, CategoryRequest>();
+            CreateMap<CategoryResponse, Category>();
+            CreateMap<Category, CategoryResponse> ();
         }
     }
 }

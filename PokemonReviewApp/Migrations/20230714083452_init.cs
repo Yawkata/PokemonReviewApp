@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace PokemonReviewApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,6 +73,8 @@ namespace PokemonReviewApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Nickname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gym = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -163,6 +167,81 @@ namespace PokemonReviewApp.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Electric" },
+                    { 2, "Water" },
+                    { 3, "Leaf" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Countries",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Something" },
+                    { 2, "Anything" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Pokemon",
+                columns: new[] { "Id", "BirthDate", "Name" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(1903, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Pikachu" },
+                    { 2, new DateTime(1903, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Squirtle" },
+                    { 3, new DateTime(1903, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Venasuar" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Reviewers",
+                columns: new[] { "Id", "FirstName", "LastName" },
+                values: new object[,]
+                {
+                    { 1, "Teddy", "Smith" },
+                    { 2, "Taylor", "Jones" },
+                    { 3, "Jessica", "McGregor" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Owners",
+                columns: new[] { "Id", "CountryId", "FirstName", "Gym", "LastName", "Nickname", "Password" },
+                values: new object[] { 1, 1, "Gosho", "Gymski", "Toshev", "Admin", "admin" });
+
+            migrationBuilder.InsertData(
+                table: "PokemonCategories",
+                columns: new[] { "CategoryId", "PokemonId" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 2, 2 },
+                    { 3, 3 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Reviews",
+                columns: new[] { "Id", "PokemonId", "Rating", "ReviewerId", "Text", "Title" },
+                values: new object[,]
+                {
+                    { 1, 1, 5, 1, "Pickahu is the best Pokémon because it is electric", "Pikachu" },
+                    { 2, 1, 5, 2, "Pickachu is the best at killing rocks", "Pikachu" },
+                    { 3, 1, 1, 3, "Pickchu, pickachu, pikachu", "Pikachu" },
+                    { 4, 2, 5, 1, "Squirtle is the best Pokémon because it is electric", "Squirtle" },
+                    { 5, 2, 5, 2, "Squirtle is the best at killing rocks", "Squirtle" },
+                    { 6, 2, 1, 3, "Squirtle, squirtle, squirtle", "Squirtle" },
+                    { 7, 3, 5, 1, "Venasaur is the best Pokémon because it is electric", "Venasaur" },
+                    { 8, 3, 5, 2, "Venasaur is the best at killing rocks", "Venasaur" },
+                    { 9, 3, 1, 3, "Venasaur, Venasaur, Venasaur", "Venasaur" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PokemonOwners",
+                columns: new[] { "OwnerId", "PokemonId" },
+                values: new object[] { 1, 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Owners_CountryId",

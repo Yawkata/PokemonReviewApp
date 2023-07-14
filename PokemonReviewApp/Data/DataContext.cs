@@ -21,6 +21,7 @@ namespace PokemonReviewApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Seeder();
             modelBuilder.Entity<PokemonCategory>()
                     .HasKey(p => new { p.PokemonId, p.CategoryId });
             modelBuilder.Entity<PokemonCategory>()

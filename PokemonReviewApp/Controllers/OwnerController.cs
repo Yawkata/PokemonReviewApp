@@ -79,22 +79,6 @@ namespace PokemonReviewApp.Controllers
             return Ok(pokemons);
         }
 
-        // Does Not Work !
-        [HttpGet("{pokeID}/owners")]
-        [ProducesResponseType(200, Type = typeof(List<Owner>))]
-        [ProducesResponseType(400)]
-        public IActionResult GetOwnersOfAPokemon(int pokeId)
-        {
-            var owners = mapper.Map<List<OwnerDto>>(ownerRepository.GetOwnersOfAPokemon(pokeId));
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(owners);
-        }
-
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

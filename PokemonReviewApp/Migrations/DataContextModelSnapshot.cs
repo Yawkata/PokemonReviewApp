@@ -37,6 +37,23 @@ namespace PokemonReviewApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Electric"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Water"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Leaf"
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.Country", b =>
@@ -54,6 +71,18 @@ namespace PokemonReviewApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Something"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Anything"
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.Owner", b =>
@@ -79,11 +108,31 @@ namespace PokemonReviewApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
 
                     b.ToTable("Owners");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CountryId = 1,
+                            FirstName = "Gosho",
+                            Gym = "Gymski",
+                            LastName = "Toshev",
+                            Nickname = "Admin",
+                            Password = "admin"
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.Pokemon", b =>
@@ -104,6 +153,26 @@ namespace PokemonReviewApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Pokemon");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BirthDate = new DateTime(1903, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Pikachu"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BirthDate = new DateTime(1903, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Squirtle"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BirthDate = new DateTime(1903, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Venasuar"
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.PokemonCategory", b =>
@@ -119,6 +188,23 @@ namespace PokemonReviewApp.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("PokemonCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            PokemonId = 1,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            PokemonId = 2,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            PokemonId = 3,
+                            CategoryId = 3
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.PokemonOwner", b =>
@@ -134,6 +220,13 @@ namespace PokemonReviewApp.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("PokemonOwners");
+
+                    b.HasData(
+                        new
+                        {
+                            PokemonId = 1,
+                            OwnerId = 1
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.Review", b =>
@@ -168,6 +261,89 @@ namespace PokemonReviewApp.Migrations
                     b.HasIndex("ReviewerId");
 
                     b.ToTable("Reviews");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PokemonId = 1,
+                            Rating = 5,
+                            ReviewerId = 1,
+                            Text = "Pickahu is the best Pokémon because it is electric",
+                            Title = "Pikachu"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PokemonId = 1,
+                            Rating = 5,
+                            ReviewerId = 2,
+                            Text = "Pickachu is the best at killing rocks",
+                            Title = "Pikachu"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PokemonId = 1,
+                            Rating = 1,
+                            ReviewerId = 3,
+                            Text = "Pickchu, pickachu, pikachu",
+                            Title = "Pikachu"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PokemonId = 2,
+                            Rating = 5,
+                            ReviewerId = 1,
+                            Text = "Squirtle is the best Pokémon because it is electric",
+                            Title = "Squirtle"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            PokemonId = 2,
+                            Rating = 5,
+                            ReviewerId = 2,
+                            Text = "Squirtle is the best at killing rocks",
+                            Title = "Squirtle"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            PokemonId = 2,
+                            Rating = 1,
+                            ReviewerId = 3,
+                            Text = "Squirtle, squirtle, squirtle",
+                            Title = "Squirtle"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            PokemonId = 3,
+                            Rating = 5,
+                            ReviewerId = 1,
+                            Text = "Venasaur is the best Pokémon because it is electric",
+                            Title = "Venasaur"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            PokemonId = 3,
+                            Rating = 5,
+                            ReviewerId = 2,
+                            Text = "Venasaur is the best at killing rocks",
+                            Title = "Venasaur"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            PokemonId = 3,
+                            Rating = 1,
+                            ReviewerId = 3,
+                            Text = "Venasaur, Venasaur, Venasaur",
+                            Title = "Venasaur"
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.Reviewer", b =>
@@ -189,6 +365,26 @@ namespace PokemonReviewApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Reviewers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Teddy",
+                            LastName = "Smith"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FirstName = "Taylor",
+                            LastName = "Jones"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            FirstName = "Jessica",
+                            LastName = "McGregor"
+                        });
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Models.Owner", b =>

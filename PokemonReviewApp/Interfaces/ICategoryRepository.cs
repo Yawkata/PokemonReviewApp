@@ -1,22 +1,27 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Dto.RequestDTOs;
+using PokemonReviewApp.Dto.ResponseDTOs;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface ICategoryRepository
     {
-        List<Category> GetCategories();
+        CategoryResponse GetCategories();
 
-        Category GetCategory(int id);
+        CategoryResponse GetCategory(int id);
 
         List<Pokemon> GetPokemonByCategory(int id);
 
         bool CategoryExists(int id);
 
-        bool CreateCategory(Category category);
+        bool CategoryExists(string categoryName);
 
-        bool UpdateCategory(Category category);
+        CategoryResponse CreateCategory(CategoryRequest category);
 
-        bool DeleteCategory(Category category);
+        CategoryResponse UpdateCategory(int categoryId, CategoryRequest category);
+
+        CategoryResponse DeleteCategory(int categoryId);
 
         bool Save();
 
