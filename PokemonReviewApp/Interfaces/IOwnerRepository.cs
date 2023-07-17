@@ -8,6 +8,8 @@ namespace PokemonReviewApp.Interfaces
 
         Owner GetOwner(int id);
 
+        Owner GetOwner(string ownerNickname);
+
         bool OwnerExists(int id);
 
         List<Owner> GetOwnersOfAPokemon(int id);

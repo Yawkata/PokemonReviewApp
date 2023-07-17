@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PokemonReviewApp.Dto;
+using PokemonReviewApp.Dto.AuthenticationDTOs;
 using PokemonReviewApp.Dto.RequestDTOs;
 using PokemonReviewApp.Dto.ResponseDTOs;
 using PokemonReviewApp.Models;
@@ -18,8 +19,12 @@ namespace PokemonReviewApp.Helper
             CreateMap<CountryDto, Country>();
             CreateMap<Owner, OwnerDto>();
             CreateMap<OwnerDto, Owner>();
-            CreateMap<OwnerDto, OwnerAuthenticationRequestDTO>();
-            CreateMap<OwnerAuthenticationRequestDTO, OwnerDto>();
+            CreateMap<OwnerDto, OwnerLoginDTO>();
+            CreateMap<Owner, OwnerLoginDTO>();
+            CreateMap<OwnerLoginDTO, OwnerDto>();
+            CreateMap<Owner, OwnerRegisterDTO>();
+            CreateMap<OwnerLoginDTO, Owner>();
+            CreateMap<OwnerRegisterDTO, Owner>();
             CreateMap<Review, ReviewDto>();
             CreateMap<ReviewDto, Review>();
             CreateMap<Reviewer, ReviewerDto>();

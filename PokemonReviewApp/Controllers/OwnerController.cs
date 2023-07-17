@@ -4,11 +4,11 @@ using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 using Microsoft.AspNetCore.Authorization;
-using PokemonReviewApp.Dto.RequestDTOs;
+using PokemonReviewApp.Dto.AuthenticationDTOs;
 
 namespace PokemonReviewApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator, RegularUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class OwnerController : Controller
@@ -86,7 +86,7 @@ namespace PokemonReviewApp.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto ownerCreate)
+        public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerRegisterDTO ownerCreate)
         {
             if (ownerCreate == null)
             {
@@ -94,8 +94,7 @@ namespace PokemonReviewApp.Controllers
             }
 
             var owner = ownerRepository.GetOwners()
-                .Where(o => o.FirstName.ToUpper() == ownerCreate.FirstName.ToUpper() &&
-                o.LastName.ToUpper() == ownerCreate.LastName.ToUpper())
+                .Where(o => o.Nickname.ToUpper() == ownerCreate.Nickname.ToUpper())
                 .FirstOrDefault();
 
             if (owner != null)
@@ -124,7 +123,7 @@ namespace PokemonReviewApp.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        public IActionResult Authenticate(OwnerAuthenticationRequestDTO userdata)
+        public IActionResult Authenticate(OwnerLoginDTO userdata)
         {
             var token = jWTManager.Authenticate(userdata);
 
@@ -136,6 +135,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(token);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{ownerId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -172,6 +172,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully updated owner!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{ownerId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

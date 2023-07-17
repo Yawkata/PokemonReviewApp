@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Dto.RequestDTOs;
@@ -9,6 +9,7 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize(Roles = "Administrator, RegularUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : Controller
@@ -67,6 +68,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(pokemons);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -82,6 +84,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully created new category!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{categoryId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -97,6 +100,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully updated category!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{categoryId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

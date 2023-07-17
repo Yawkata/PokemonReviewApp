@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Data;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize(Roles = "Administrator, RegularUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class CountryController : Controller
@@ -69,6 +72,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(country);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -105,6 +109,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully created new country!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{countryId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -141,6 +146,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully updated country!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

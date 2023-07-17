@@ -15,6 +15,7 @@ namespace PokemonReviewApp.Repository
 
         public bool CreateOwner(Owner owner)
         {
+            owner.Role = "RegularUser";
             context.Add(owner);
             return Save();
         }
@@ -22,6 +23,11 @@ namespace PokemonReviewApp.Repository
         public Owner GetOwner(int ownerId)
         {
             return context.Owners.Where(o => o.Id == ownerId).FirstOrDefault();
+        }
+
+        public Owner GetOwner(string ownerNickname)
+        {
+            return context.Owners.Where(o => o.Nickname == ownerNickname).FirstOrDefault();
         }
 
         public List<Owner> GetOwners()

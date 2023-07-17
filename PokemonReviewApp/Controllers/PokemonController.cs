@@ -1,19 +1,19 @@
 ﻿using AutoMapper;
-using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc; // model view controller
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Data;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize(Roles = "Administrator, RegularUser")]
     [Route("api/[controller]")] // atributes  ex.:localhost:7000/Pokemon/GetPokemons
     [ApiController]
     public class PokemonController : Controller
     {
         private readonly IPokemonRepository pokemonRepository;
-        private readonly IOwnerRepository ownerRepository;
-        private readonly ICategoryRepository categoryRepository;
         private readonly IReviewRepository reviewRepository;
         private readonly IMapper mapper;
 
@@ -22,8 +22,6 @@ namespace PokemonReviewApp.Controllers
             IReviewRepository reviewRepository, IMapper mapper)
         {
             this.pokemonRepository = pokemonRepository;
-            this.ownerRepository = ownerRepository;
-            this.categoryRepository = categoryRepository;
             this.reviewRepository = reviewRepository;
             this.mapper = mapper;
         }
@@ -81,6 +79,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(pokemonRepository.GetPokemonRating(pokeId));
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -117,6 +116,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully created new pokemon!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{pokeId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -152,6 +152,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully updated pokemon!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{pokeId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

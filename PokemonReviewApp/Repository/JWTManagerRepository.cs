@@ -1,7 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using PokemonReviewApp.Data;
-using PokemonReviewApp.Dto;
-using PokemonReviewApp.Dto.RequestDTOs;
+using PokemonReviewApp.Dto.AuthenticationDTOs;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,20 +11,24 @@ namespace PokemonReviewApp.Repository
     public class JWTManagerRepository : IJWTManagerRepository
     {
         private readonly IConfiguration iconfiguration;
-        private readonly DataContext context;
+        private readonly IOwnerRepository ownerRepository;
 
-        public JWTManagerRepository(IConfiguration iconfiguration, DataContext context)
+        public JWTManagerRepository(IConfiguration iconfiguration, IOwnerRepository ownerRepository)
         {
             this.iconfiguration = iconfiguration;
-            this.context = context;
+            this.ownerRepository = ownerRepository;
         }
-        public Tokens Authenticate(OwnerAuthenticationRequestDTO user)
+        public Tokens Authenticate(OwnerLoginDTO userCredentials)
         {
-            var users = context.Owners.ToList();
-            if (!users.Any(x => x.Nickname == user.Nickname && x.Password == user.Password))
+            var users = ownerRepository.GetOwners();
+            
+
+            if (!users.Any(x => x.Nickname == userCredentials.Nickname && x.Password == userCredentials.Password))
             {
                 return null;
             }
+
+            var user = ownerRepository.GetOwner(userCredentials.Nickname);
 
             var tokenKey = Encoding.UTF8.GetBytes(iconfiguration["JWT:Key"]);
             var securityKey = new SymmetricSecurityKey(tokenKey);
@@ -39,7 +41,7 @@ namespace PokemonReviewApp.Repository
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.Name, user.Nickname),
-                    // new Claim(ClaimTypes.Role, users.Role)}),
+                    new Claim(ClaimTypes.Role, user.Role),
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = credentials

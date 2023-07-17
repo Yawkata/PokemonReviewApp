@@ -1,6 +1,6 @@
-﻿namespace PokemonReviewApp.Dto.RequestDTOs
+﻿namespace PokemonReviewApp.Dto.AuthenticationDTOs
 {
-    public class OwnerAuthenticationRequestDTO
+    public class OwnerLoginDTO
     {
         public string Nickname { get; set; }
         public string Password { get; set; }

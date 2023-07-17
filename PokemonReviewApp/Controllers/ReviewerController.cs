@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
-using PokemonReviewApp.Repository;
+using System.Data;
 
 namespace PokemonReviewApp.Controllers
 {
+    [Authorize(Roles = "Administrator, RegularUser")]
     [Route("api/[controller]")]
     [ApiController]
     public class ReviewerController : Controller
@@ -75,6 +77,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(reviews);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -112,6 +115,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully created new reviewer!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{reviewerId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -147,6 +151,7 @@ namespace PokemonReviewApp.Controllers
             return Ok("Successfully updated reviewer!");
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{reviewerId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

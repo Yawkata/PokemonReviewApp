@@ -32,6 +32,7 @@ namespace PokemonReviewApp
                     Password = "admin",
                     FirstName = "Gosho",
                     LastName = "Toshev",
+                    Role = "Administrator",
                     CountryId = 1,
                     Gym = "Gymski"
                 }

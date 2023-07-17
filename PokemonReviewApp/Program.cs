@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = false,
         ValidateAudience = false,
-        ValidateLifetime = false,
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
@@ -50,7 +50,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var securityScheme = new OpenApiSecurityScheme()
 {
-    Name = "Authorisation",
+    Name = "Authorization",
     Type = SecuritySchemeType.ApiKey,
     Scheme = "Bearer",
     BearerFormat = "JWT",
@@ -63,6 +63,7 @@ var securityRequirements = new OpenApiSecurityRequirement()
     {
         new OpenApiSecurityScheme
         {
+            Name = "Bearer",
             In = ParameterLocation.Header,
             Reference = new OpenApiReference
             {
