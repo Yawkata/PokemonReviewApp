@@ -20,7 +20,7 @@ namespace PokemonReviewApp.Repository
         }
         public Tokens Authenticate(OwnerLoginDTO userCredentials)
         {
-            var users = ownerRepository.GetOwners();
+            var users = ownerRepository.GetOwnersForLogIn();
             
 
             if (!users.Any(x => x.Nickname == userCredentials.Nickname && x.Password == userCredentials.Password))

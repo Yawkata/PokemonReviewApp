@@ -1,24 +1,26 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Dto.RequestDTOs;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface ICountryRepository
     {
-        List<Country> GetCountries();
+        CountryResponse GetCountries();
 
-        Country GetCountry(int id);
+        CountryResponse GetCountry(int countryId);
 
-        Country GetCountryByOwner(int id);
-        
-        List<Owner> GetOwnersFromCountry(int id);
+        CountryResponse GetCountryByOwner(int id);
 
-        bool CreateCountry(Country country);
+        CountryResponse CreateCountry(CountryRequest countryCreate);
+
+        CountryResponse UpdateCountry(int countryId, CountryRequest country);
+
+        CountryResponse DeleteCountry(int countryId);
 
         bool CountryExists(int id);
 
-        bool UpdateCountry(Country country);
-
-        bool DeleteCountry(Country country);
+        bool CountryExists(string name);
 
         bool Save();
     }

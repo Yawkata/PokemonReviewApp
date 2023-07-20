@@ -58,14 +58,15 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetPokemonByCategory(int categoryId)
         {
-            if (!categoryRepository.CategoryExists(categoryId))
+
+            var response = categoryRepository.GetPokemonByCategory(categoryId);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return NotFound();
+                return BadRequest(response);
             }
 
-            var pokemons = mapper.Map<List<PokemonDto>>(categoryRepository.GetPokemonByCategory(categoryId));
-
-            return Ok(pokemons);
+            return Ok(response);
         }
 
         [Authorize(Roles = "Administrator")]
@@ -81,7 +82,7 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(response);
             }
 
-            return Ok("Successfully created new category!");
+            return Ok(String.Format(GlobalConstants.SuccessfulCreate, "category"));
         }
 
         [Authorize(Roles = "Administrator")]
@@ -97,7 +98,7 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(response);
             }
 
-            return Ok("Successfully updated category!");
+            return Ok(String.Format(GlobalConstants.SuccessfulUpdate, "category"));
         }
 
         [Authorize(Roles = "Administrator")]
@@ -113,7 +114,7 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(response);
             }
 
-            return Ok("Successfully deleted category!");
+            return Ok(String.Format(GlobalConstants.SuccessfulDelete, "category"));
         }
 
     }

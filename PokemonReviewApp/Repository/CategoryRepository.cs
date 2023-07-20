@@ -21,28 +21,6 @@ namespace PokemonReviewApp.Repository
             this._mapper = mapper;
         }
 
-        public CategoryResponse CreateCategory(CategoryRequest categoryCreate)
-        {
-            CategoryResponse response = new();
-
-            if(CategoryExists(categoryCreate.Name))
-            {
-                response.ServerMessage = String.Format(GlobalConstants.AlreadyExists, "Category");
-                return response;
-            }
-
-            var categoryMap = _mapper.Map<Category>(categoryCreate);
-
-            _context.Add(categoryMap);
-            Save();
-
-            var category = _context.Categories.FirstOrDefault(x => x.Name == categoryCreate.Name);
-            response.Categories.Add(_mapper.Map<CategoryDto>(category));
-            response.ServerMessage = GlobalConstants.Success;
-
-            return response;
-        }
-
         public CategoryResponse GetCategories()
         {
             CategoryResponse response = new();
@@ -72,12 +50,44 @@ namespace PokemonReviewApp.Repository
             return response;
         }
 
-        public List<Pokemon> GetPokemonByCategory(int categoryId)
+        public PokemonResponse GetPokemonByCategory(int categoryId)
         {
-            var categories = _context.PokemonCategories.Where(c => c.CategoryId == categoryId);
-            List<Pokemon> pokemons = categories.Select(c => c.Pokemon).ToList();
+            PokemonResponse response = new();
 
-            return pokemons;
+            if (!CategoryExists(categoryId))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.Notfound, "Category");
+                return response;
+            }
+
+            var pokemons = _context.PokemonCategories.Where(o => o.CategoryId == categoryId).Select(p => p.Pokemon).ToList();
+
+            response.Pokemons = _mapper.Map<List<PokemonDto>>(pokemons);
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
+        }
+
+        public CategoryResponse CreateCategory(CategoryRequest categoryCreate)
+        {
+            CategoryResponse response = new();
+
+            if (CategoryExists(categoryCreate.Name))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.AlreadyExists, "Category");
+                return response;
+            }
+
+            var categoryMap = _mapper.Map<Category>(categoryCreate);
+
+            _context.Add(categoryMap);
+            Save();
+
+            var category = _context.Categories.FirstOrDefault(x => x.Name == categoryCreate.Name);
+            response.Categories.Add(_mapper.Map<CategoryDto>(category));
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
         }
 
         public CategoryResponse UpdateCategory(int categoryId, CategoryRequest categoryUpdate)
@@ -89,7 +99,13 @@ namespace PokemonReviewApp.Repository
                 response.ServerMessage = String.Format(GlobalConstants.Notfound, "Category");
                 return response;
             }
-            
+
+            if (CategoryExists(categoryUpdate.Name))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.AlreadyExists, "Category");
+                return response;
+            }
+
             var category = _mapper.Map<Category>(categoryUpdate);
             category.Id = categoryId;
 
@@ -121,10 +137,6 @@ namespace PokemonReviewApp.Repository
 
             return response;
         }
-        public bool Save()
-        {
-            return _context.SaveChanges() > 0 ? true : false;
-        }
 
         public bool CategoryExists(int categoryId)
         {
@@ -133,8 +145,12 @@ namespace PokemonReviewApp.Repository
 
         public bool CategoryExists(string categoryName)
         {
-            return _context.Categories.Any(x => x.Name == categoryName);
+            return _context.Categories.Any(x => x.Name.ToUpper() == categoryName.ToUpper());
         }
 
+        public bool Save()
+        {
+            return _context.SaveChanges() > 0 ? true : false;
+        }
     }
 }

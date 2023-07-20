@@ -1,22 +1,23 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface IReviewerRepository
     {
-        List<Reviewer> GetReviewers();
+        ReviewerResponse GetReviewers();
 
-        Reviewer GetReviewer(int reviewerId);
+        ReviewerResponse GetReviewer(int reviewerId);
 
-        List<Review> GetReviewsByReviewer(int reviewerId);
+        ReviewResponse GetReviewsByReviewer(int reviewerId);
+
+        ReviewerResponse CreateReviewer(ReviewerRequest reviewer);
+
+        ReviewerResponse UpdateReviewer(int reviewerID, ReviewerRequest reviewer);
+
+        ReviewerResponse DeleteReviewer(int reviewerId);
 
         bool ReviewerExists(int reviewerId);
-
-        bool CreateReviewer(Reviewer reviewer);
-
-        bool UpdateReviewer(Reviewer reviewer);
-
-        bool DeleteReviewer(Reviewer reviewer);
 
         bool Save();
     }

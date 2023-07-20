@@ -1,22 +1,25 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface IReviewRepository
     {
-        List<Review> GetReviews();
+        ReviewResponse GetReviews();
 
-        Review GetReview(int reviewId);
+        ReviewResponse GetReview(int reviewId);
 
-        List<Review> GetReviewsOfAPokemon(int pokeId);
+        ReviewResponse GetReviewsOfAPokemon(int pokeId);
+
+        ReviewResponse CreateReview(int reviewwerId, int pokeId, ReviewRequest review);
+
+        ReviewResponse UpdateReview(int reviewId, ReviewRequest review);
+
+        ReviewResponse DeleteReview(int reviewId);
 
         bool ReviewExists(int reviewId);
 
-        bool CreateReview(Review review);
-
-        bool UpdateReview(Review review);
-
-        bool DeleteReview(Review review);
+        bool ReviewExists(string reviewTitle);
 
         bool DeleteReviews(List<Review> reviews);
 

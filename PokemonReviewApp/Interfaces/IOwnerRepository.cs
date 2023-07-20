@@ -1,26 +1,30 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Dto.AuthenticationDTOs;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface IOwnerRepository
     {
-        List<Owner> GetOwners();
+        OwnerResponse GetOwners();
 
-        Owner GetOwner(int id);
+        public List<Owner> GetOwnersForLogIn();
+
+        OwnerResponse GetOwner(int id);
 
         Owner GetOwner(string ownerNickname);
 
+        PokemonResponse GetPokemonsByOwner(int id);
+
+        OwnerResponse CreateOwner(int countryId, OwnerRegisterDTO owner);
+
+        OwnerResponse UpdateOwner(int ownerId, int countryId, OwnerRequest owner);
+
+        OwnerResponse DeleteOwner(int ownerId);
+
         bool OwnerExists(int id);
 
-        List<Owner> GetOwnersOfAPokemon(int id);
-
-        List<Pokemon> GetPokemonsByOwner(int id);
-
-        bool CreateOwner(Owner owner);
-
-        bool UpdateOwner(Owner owner);
-
-        bool DeleteOwner(Owner owner);
+        bool OwnerExists(string nikname);
 
         bool Save();
 

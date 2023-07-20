@@ -11,17 +11,17 @@ namespace PokemonReviewApp.Interfaces
 
         CategoryResponse GetCategory(int id);
 
-        List<Pokemon> GetPokemonByCategory(int id);
-
-        bool CategoryExists(int id);
-
-        bool CategoryExists(string categoryName);
+        PokemonResponse GetPokemonByCategory(int id);
 
         CategoryResponse CreateCategory(CategoryRequest category);
 
         CategoryResponse UpdateCategory(int categoryId, CategoryRequest category);
 
         CategoryResponse DeleteCategory(int categoryId);
+
+        bool CategoryExists(int id);
+
+        bool CategoryExists(string categoryName);
 
         bool Save();
 

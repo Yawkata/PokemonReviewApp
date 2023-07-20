@@ -1,24 +1,25 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
     public interface IPokemonRepository
     {
-        List<Pokemon> GetPokemons();
+        PokemonResponse GetPokemons();
 
-        Pokemon GetPokemon(int id);
-
-        Pokemon GetPokemon(string name);
+        PokemonResponse GetPokemon(int id);
 
         decimal GetPokemonRating(int id);
 
+        PokemonResponse CreatePokemon(int ownerId, int categoryId, PokemonRequest pokemon);
+
+        PokemonResponse UpdatePokemon(int pokeId, PokemonRequest pokemon);
+
+        PokemonResponse DeletePokemon(int pokeId);
+
         bool PokemonExists(int id);
 
-        bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon);
-
-        bool UpdatePokemon(Pokemon pokemon);
-
-        bool DeletePokemon(Pokemon pokemon);
+        bool PokemonExists(string name);
 
         bool Save();
     }

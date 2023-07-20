@@ -33,6 +33,29 @@ namespace PokemonReviewApp.Helper
             CreateMap<Category, CategoryRequest>();
             CreateMap<CategoryResponse, Category>();
             CreateMap<Category, CategoryResponse> ();
+
+            CreateMap<CountryRequest, Country>();
+            CreateMap<Country, CountryRequest>();
+            CreateMap<CountryResponse, Country>();
+            CreateMap<Country, CountryResponse>();
+
+            CreateMap<OwnerRegisterDTO, Owner>();
+            CreateMap<Owner, OwnerRegisterDTO>();
+            CreateMap<OwnerResponse, Owner>();
+            CreateMap<Owner, OwnerResponse>();
+            CreateMap<OwnerRequest, Owner>();
+            CreateMap<Owner, OwnerRequest>();
+
+            CreateMap<ReviewRequest, Review>();
+            CreateMap<Review, ReviewRequest>();
+            CreateMap<ReviewResponse, Review>();
+            CreateMap<Review, ReviewResponse>();
+
+            CreateMap<Pokemon, PokemonRequest>();
+            CreateMap<PokemonRequest, Pokemon>();
+
+            CreateMap<Reviewer, ReviewerRequest>();
+            CreateMap<ReviewerRequest, Reviewer>();
         }
     }
 }

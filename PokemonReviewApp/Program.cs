@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Repository;

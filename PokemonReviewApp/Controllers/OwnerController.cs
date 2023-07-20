@@ -5,6 +5,8 @@ using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using PokemonReviewApp.Dto.AuthenticationDTOs;
+using PokemonReviewApp.Helper;
+using PokemonReviewApp.Migrations;
 
 namespace PokemonReviewApp.Controllers
 {
@@ -33,14 +35,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetOwners()
         {
-            var owners = mapper.Map<List<OwnerDto>>(ownerRepository.GetOwners());
+            var response = ownerRepository.GetOwners();
 
-            if (!ModelState.IsValid)
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            return Ok(owners);
+            return Ok(response);
         }
 
         [HttpGet("{ownerId}")]
@@ -48,19 +50,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetOwner(int ownerId)
         {
-            if (!ownerRepository.OwnerExists(ownerId))
+            var response = ownerRepository.GetOwner(ownerId);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return NotFound();
+                return BadRequest(response);
             }
 
-            var owner = mapper.Map<OwnerDto>(ownerRepository.GetOwner(ownerId));
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(owner);
+            return Ok(response);
         }
 
         [HttpGet("{ownerId}/pokemons")]
@@ -68,19 +65,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)] 
         public IActionResult GetPokemonsByOwner(int ownerId)
         {
-            if (!ownerRepository.OwnerExists(ownerId))
+            var response = ownerRepository.GetPokemonsByOwner(ownerId);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return NotFound();
+                return BadRequest(response);
             }
 
-            var pokemons = mapper.Map<List<PokemonDto>>(ownerRepository.GetPokemonsByOwner(ownerId));
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(pokemons);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -88,36 +80,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerRegisterDTO ownerCreate)
         {
-            if (ownerCreate == null)
+            var response = ownerRepository.CreateOwner(countryId, ownerCreate);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            var owner = ownerRepository.GetOwners()
-                .Where(o => o.Nickname.ToUpper() == ownerCreate.Nickname.ToUpper())
-                .FirstOrDefault();
-
-            if (owner != null)
-            {
-                ModelState.AddModelError("", "Owner Already Exists!");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var ownerMap = mapper.Map<Owner>(ownerCreate);
-            ownerMap.Country = countryRepository.GetCountry(countryId);
-
-            if (!ownerRepository.CreateOwner(ownerMap))
-            {
-                ModelState.AddModelError("", "Error while saving owner");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully created new owner!");
+            return Ok(String.Format(GlobalConstants.SuccessfulCreate, "onwer"));
         }
 
         [AllowAnonymous]
@@ -139,37 +109,16 @@ namespace PokemonReviewApp.Controllers
         [HttpPut("{ownerId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult UpdateOwner(int ownerId, [FromBody] OwnerDto ownerUpdate)
+        public IActionResult UpdateOwner(int ownerId, [FromQuery] int countryId, [FromBody] OwnerRequest ownerUpdate)
         {
-            if (ownerUpdate == null)
+            var response = ownerRepository.UpdateOwner(ownerId, countryId, ownerUpdate);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            if (ownerId != ownerUpdate.Id)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!ownerRepository.OwnerExists(ownerId))
-            {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var ownerMap = mapper.Map<Owner>(ownerUpdate);
-
-            if (!ownerRepository.UpdateOwner(ownerMap))
-            {
-                ModelState.AddModelError("", "Error while updating owner!");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully updated owner!");
+            return Ok(String.Format(GlobalConstants.SuccessfulUpdate, "onwer"));
         }
 
         [Authorize(Roles = "Administrator")]
@@ -178,25 +127,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult DeleteOwner(int ownerId)
         {
-            if (!ownerRepository.OwnerExists(ownerId))
+            var response = ownerRepository.DeleteOwner(ownerId);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return NotFound();
+                return BadRequest(response);
             }
 
-            var ownerToDelete = ownerRepository.GetOwner(ownerId);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!ownerRepository.DeleteOwner(ownerToDelete))
-            {
-                ModelState.AddModelError("", "Error while deleting owner");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully deleted owner!");
+            return Ok(String.Format(GlobalConstants.SuccessfulDelete, "onwer"));
         }
     }
 }

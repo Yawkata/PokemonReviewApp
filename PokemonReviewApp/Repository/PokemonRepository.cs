@@ -1,36 +1,57 @@
-﻿using PokemonReviewApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto.ResponseDTOs;
+using PokemonReviewApp.Dto;
+using PokemonReviewApp.Helper;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using AutoMapper;
 
 namespace PokemonReviewApp.Repository
 {
     public class PokemonRepository : IPokemonRepository
     {
-        public readonly DataContext context;
+        private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public PokemonRepository(DataContext context) 
+        public PokemonRepository(DataContext context, IMapper mapper) 
         {     
-            this.context = context;
+            _context = context;
+            _mapper = mapper;
         }
 
-        public List<Pokemon> GetPokemons()
+        public PokemonResponse GetPokemons()
         {
-            return context.Pokemon.OrderBy(p => p.Id).ToList();
+            PokemonResponse response = new();
+
+            var pokemons = _context.Pokemon.OrderBy(c => c.Id).ToList();
+
+            response.Pokemons = _mapper.Map<List<PokemonDto>>(pokemons);
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
         }
 
-        public Pokemon GetPokemon(int id)
+        public PokemonResponse GetPokemon(int pokeId)
         {
-            return context.Pokemon.Where(p => p.Id == id).FirstOrDefault();
+            PokemonResponse response = new();
+
+            if (!PokemonExists(pokeId))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.Notfound, "Pokemon");
+                return response;
+            }
+
+            var pokemon = _context.Pokemon.FirstOrDefault(c => c.Id == pokeId);
+            response.Pokemons.Add(_mapper.Map<PokemonDto>(pokemon));
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
         }
 
-        public Pokemon GetPokemon(string name)
+        public decimal GetPokemonRating(int pokeId)
         {
-            return context.Pokemon.Where(p => p.Name == name).FirstOrDefault();
-        }
-
-        public decimal GetPokemonRating(int id)
-        {
-            var review = context.Reviews.Where(p => p.Pokemon.Id == id);
+            var review = _context.Reviews.Where(p => p.Pokemon.Id == pokeId);
 
             if (review.Count() <= 0)
             {
@@ -40,58 +61,111 @@ namespace PokemonReviewApp.Repository
             return ((decimal)review.Average(r => r.Rating));
         }
 
-        public bool PokemonExists(int id)
+        public PokemonResponse CreatePokemon(int ownerId, int categoryId, PokemonRequest pokemonCreate)
         {
-            if (context.Pokemon.Where(p => p.Id == id).Count() > 0)
+            PokemonResponse response = new();
+
+            if (PokemonExists(pokemonCreate.Name))
             {
-                return true;
+                response.ServerMessage = String.Format(GlobalConstants.AlreadyExists, "Pokemon");
+                return response;
             }
 
-            return false;
-        }
+            var pokeMap = _mapper.Map<Pokemon>(pokemonCreate);
 
-        public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
-        {
-            var ownerEntity = context.Owners.Where(o => o.Id == ownerId).FirstOrDefault();
+            var ownerEntity = _context.Owners.Where(o => o.Id == ownerId).FirstOrDefault();
 
             var pokemonOwner = new PokemonOwner()
             {
                 Owner = ownerEntity,
-                Pokemon = pokemon,
+                Pokemon = pokeMap,
             };
 
-            context.Add(pokemonOwner);
+            _context.Add(pokemonOwner);
 
-            var categoryEntity = context.Categories.Where(c => c.Id == categoryId).FirstOrDefault();
+            var categoryEntity = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault();
 
             var pokemonCategory = new PokemonCategory()
             {
                 Category = categoryEntity,
-                Pokemon = pokemon,
+                Pokemon = pokeMap,
             };
 
-            context.Add(pokemonCategory);
+            _context.Add(pokemonCategory);
 
-            context.Add(pokemon);
+            _context.Add(pokeMap);
+            Save();
 
-            return Save();
+            var pokemon = _context.Pokemon.FirstOrDefault(x => x.Name == pokemonCreate.Name);
+            response.Pokemons.Add(_mapper.Map<PokemonDto>(pokemon));
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
         }
 
-        public bool UpdatePokemon(Pokemon pokemon)
+        public PokemonResponse UpdatePokemon(int pokeId, PokemonRequest pokemonUpdate)
         {
-            context.Update(pokemon);
-            return Save();
+            PokemonResponse response = new();
+
+            if (!PokemonExists(pokeId))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.Notfound, "Pokemon");
+                return response;
+            }
+
+            if (PokemonExists(pokemonUpdate.Name))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.AlreadyExists, "Pokemon");
+                return response;
+            }
+
+            var pokemon = _mapper.Map<Pokemon>(pokemonUpdate);
+            pokemon.Id = pokeId;
+
+            _context.Update(pokemon);
+            Save();
+
+            response.Pokemons.Add(_mapper.Map<PokemonDto>(pokemon));
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
         }
 
-        public bool DeletePokemon(Pokemon pokemon)
+        public PokemonResponse DeletePokemon(int pokeId)
         {
-            context.Remove(pokemon);
-            return Save();
+            PokemonResponse response = new();
+
+            if (!PokemonExists(pokeId))
+            {
+                response.ServerMessage = String.Format(GlobalConstants.Notfound, "Pokemon");
+                return response;
+            }
+
+            var pokemonToDelete = _context.Pokemon.FirstOrDefault(c => c.Id == pokeId);
+            var reviewsToDelete = _context.Pokemon.Where(p => p.Id == pokeId).Select(p => p.Reviews).FirstOrDefault();
+
+            _context.RemoveRange(reviewsToDelete);
+            _context.Remove(pokemonToDelete);
+            Save();
+
+            response.ServerMessage = GlobalConstants.Success;
+
+            return response;
+        }
+
+        public bool PokemonExists(int id)
+        {
+            return _context.Pokemon.Any(p => p.Id == id);
+        }
+
+        public bool PokemonExists(string name)
+        {
+            return _context.Pokemon.Any(p => p.Name.ToUpper() == name.ToUpper());
         }
 
         public bool Save()
         {
-            return context.SaveChanges() > 0 ? true : false;
+            return _context.SaveChanges() > 0 ? true : false;
         }
     }
 }

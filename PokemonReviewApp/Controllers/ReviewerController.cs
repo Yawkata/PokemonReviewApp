@@ -1,10 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
+using PokemonReviewApp.Helper;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
-using System.Data;
 
 namespace PokemonReviewApp.Controllers
 {
@@ -14,12 +13,10 @@ namespace PokemonReviewApp.Controllers
     public class ReviewerController : Controller
     {
         private readonly IReviewerRepository reviewerRepository;
-        private readonly IMapper mapper;
 
-        public ReviewerController(IReviewerRepository reviewerRepository, IMapper mapper)
+        public ReviewerController(IReviewerRepository reviewerRepository)
         {
             this.reviewerRepository = reviewerRepository;
-            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -27,14 +24,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetReviewers()
         {
-            var reviewers = mapper.Map<List<ReviewerDto>>(reviewerRepository.GetReviewers());
+            var response = reviewerRepository.GetReviewers();
 
-            if (!ModelState.IsValid)
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            return Ok(reviewers);
+            return Ok(response);
         }
 
         [HttpGet("{reviewerId}")]
@@ -42,19 +39,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetReviewer(int reviewerId)
         {
-            if (!reviewerRepository.ReviewerExists(reviewerId))
+            var response = reviewerRepository.GetReviewer(reviewerId);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return NotFound();
+                return BadRequest(response);
             }
 
-            var reviewers = mapper.Map<ReviewerDto>(reviewerRepository.GetReviewer(reviewerId));
-
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok(reviewers);
+            return Ok(response);
         }
 
         [HttpGet("{reviewerId}/reviews")]
@@ -62,93 +54,46 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetReviewsByReviewer(int reviewerId)
         {
-            if (!reviewerRepository.ReviewerExists(reviewerId))
-            { 
-                return NotFound();
-            }
+            var response = reviewerRepository.GetReviewsByReviewer(reviewerId);
 
-            var reviews = mapper.Map<List<ReviewDto>>(reviewerRepository.GetReviewsByReviewer(reviewerId));
-
-            if(!ModelState.IsValid)
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            return Ok(reviews);
+            return Ok(response);
         }
 
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateReviewer([FromBody] ReviewerDto reviewerCreate)
+        public IActionResult CreateReviewer([FromBody] ReviewerRequest reviewerCreate)
         {
-            if (reviewerCreate == null)
+            var response = reviewerRepository.CreateReviewer(reviewerCreate);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            var reviewer = reviewerRepository.GetReviewers()
-                .Where(r => r.FirstName.ToUpper() == reviewerCreate.FirstName.ToUpper() &&
-                r.LastName.ToUpper() == reviewerCreate.LastName.ToUpper())
-                .FirstOrDefault();
-
-            if (reviewer != null)
-            {
-                ModelState.AddModelError("", "Reviewer Already Exists!");
-                StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var reviewerMap = mapper.Map<Reviewer>(reviewerCreate);
-
-            if (!reviewerRepository.CreateReviewer(reviewerMap))
-            {
-                ModelState.AddModelError("", "Error while saving reviewer!");
-                StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully created new reviewer!");
+            return Ok(String.Format(GlobalConstants.SuccessfulCreate, "reviewer"));
         }
 
         [Authorize(Roles = "Administrator")]
         [HttpPut("{reviewerId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult UpdateReviewer(int reviewerId, [FromBody] ReviewerDto reviewerUpdate)
+        public IActionResult UpdateReviewer(int reviewerId, [FromBody] ReviewerRequest reviewerUpdate)
         {
-            if (reviewerUpdate == null)
+            var response = reviewerRepository.UpdateReviewer(reviewerId, reviewerUpdate);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return BadRequest(ModelState);
+                return BadRequest(response);
             }
 
-            if (reviewerId != reviewerUpdate.Id)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!reviewerRepository.ReviewerExists(reviewerId))
-            {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var reviewerMap = mapper.Map<Reviewer>(reviewerUpdate);
-
-            if (!reviewerRepository.UpdateReviewer(reviewerMap))
-            {
-                ModelState.AddModelError("", "Error while updating reviewer!");
-            }
-
-            return Ok("Successfully updated reviewer!");
+            return Ok(String.Format(GlobalConstants.SuccessfulUpdate, "reviewer"));
         }
 
         [Authorize(Roles = "Administrator")]
@@ -157,25 +102,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult DeleteReviewer(int reviewerId)
         {
-            if (!reviewerRepository.ReviewerExists(reviewerId))
+            var response = reviewerRepository.DeleteReviewer(reviewerId);
+
+            if (response.ServerMessage != GlobalConstants.Success)
             {
-                return NotFound();
+                return BadRequest(response);
             }
 
-            var reviewerToDelete = reviewerRepository.GetReviewer(reviewerId);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!reviewerRepository.DeleteReviewer(reviewerToDelete))
-            {
-                ModelState.AddModelError("", "Error while deleting reviewer");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully deleted reviewer!");
+            return Ok(String.Format(GlobalConstants.SuccessfulDelete, "reviewer"));
         }
     }
 }
