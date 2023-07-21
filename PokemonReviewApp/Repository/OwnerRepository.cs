@@ -119,16 +119,15 @@ namespace PokemonReviewApp.Repository
             }
             var owner = _context.Owners.FirstOrDefault(o => o.Id == ownerId);
 
-            var updatedOwner = _mapper.Map<Owner>(ownerUpdate);
-            updatedOwner.Password = owner.Password;
-            updatedOwner.Id = ownerId;
-            updatedOwner.Country = newCountry;
-            updatedOwner.CountryId = countryId;
+            owner.Country = newCountry;
+            owner.FirstName = ownerUpdate.FirstName;
+            owner.LastName = ownerUpdate.LastName;
+            owner.Nickname = ownerUpdate.Nickname;
+            owner.Gym = ownerUpdate.Gym;
 
-            _context.Update(updatedOwner);
             Save();
 
-            response.Owners.Add(_mapper.Map<OwnerDto>(updatedOwner));
+            response.Owners.Add(_mapper.Map<OwnerDto>(owner));
             response.ServerMessage = GlobalConstants.Success;
 
             return response;

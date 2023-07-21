@@ -51,6 +51,9 @@ namespace PokemonReviewApp.Helper
             CreateMap<ReviewResponse, Review>();
             CreateMap<Review, ReviewResponse>();
 
+            CreateMap<ReviewRequest, ReviewDto>();
+            CreateMap<ReviewDto, ReviewRequest>();
+
             CreateMap<Pokemon, PokemonRequest>();
             CreateMap<PokemonRequest, Pokemon>();
 

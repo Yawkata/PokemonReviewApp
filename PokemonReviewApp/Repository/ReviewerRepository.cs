@@ -97,7 +97,7 @@ namespace PokemonReviewApp.Repository
 
             _context.Update(reviewer);
             Save();
-            ;
+
             response.Reviewers.Add(_mapper.Map<ReviewerDto>(reviewer));
             response.ServerMessage = GlobalConstants.Success;
 

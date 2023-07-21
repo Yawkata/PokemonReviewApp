@@ -108,13 +108,18 @@ namespace PokemonReviewApp.Repository
                 response.ServerMessage = String.Format(GlobalConstants.AlreadyExists, "Review");
                 return response;
             }
+            var review = _context.Reviews.FirstOrDefault(r => r.Id == reviewId);
+            review.Text = reviewUpdate.Text;
+            review.Title = reviewUpdate.Title;
+            review.Rating = reviewUpdate.Rating;
+            //var review = _mapper.Map<Review>(reviewUpdate);
+            //review.Id = reviewId;
 
-            var review = _mapper.Map<Review>(reviewUpdate);
-            review.Id = reviewId;
 
-            _context.Update(review);
+
+            //_context.Update(review);
             Save();
-            ;
+
             response.Reviews.Add(_mapper.Map<ReviewDto>(review));
             response.ServerMessage = GlobalConstants.Success;
 
